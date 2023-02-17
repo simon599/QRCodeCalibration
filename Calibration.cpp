@@ -30,7 +30,7 @@ int main(int argc, char **argv) {
 	generateQR();
     glutInit(&argc, argv);
 	glutInitWindowPosition(0, 0);
-	glutInitWindowSize(460, 460);
+	glutInitWindowSize(920, 920);
 	glutCreateWindow("Draw Rectangle");
 	glutInitDisplayMode(GLUT_SINGLE | GLUT_RGB);
 	glClearColor(1.0, 1.0, 1.0, 1.0);
@@ -51,46 +51,49 @@ static void generateQR() {
     printQr(qr);
 }
 
-void drawBlock(int i, int j)
-{
-	int xmin, ymin, xmax, ymax;
-	xmin = (20 + (i * 20));
-	ymin = (20 + (j * 20));
-	xmax = xmin + 20;
-	ymax = ymin + 20;
-	glColor3f(0.0, 0.0, 0.0);
-	glLineWidth(2);
-	glBegin(GL_POLYGON);
-	glVertex2f(xmin, ymin);
-	glVertex2f(xmin, ymax);
-	glVertex2f(xmax, ymax);
-	glVertex2f(xmax, ymin);
-	glEnd();
-	glFlush();
-}
-
 void drawQR()
 {
-	int i, j;
-	for (i = 0; i < 21; i++)
-	{
-		for (j = 0; j < 21; j++)
-		{
-			if (A[i][j])
-			{
-				drawBlock(i,j);
-			}
-		}	
-	}
+    GLshort vertices[3528] = {};
+    int i, j, count = 0;
+    short xmin, ymin, xmax, ymax;
+    for (i = 0; i < 21; i++)
+    {
+        for (j = 0; j < 21; j++)
+        {
+            if (A[i][j])
+            {
+                xmin = (40 + (i * 40));
+                ymin = (40 + (j * 40));
+                xmax = xmin + 40;
+                ymax = ymin + 40;
+                vertices[count] = xmin;
+                vertices[count+1] = ymax;
+                vertices[count+2] = xmax;
+                vertices[count+3] = ymax;
+                vertices[count+4] = xmax;
+                vertices[count+5] = ymin;
+                vertices[count+6] = xmin;
+                vertices[count+7] = ymin;
+                count += 8;
+            }
+        }
+    }
+    glColor3s(0,0,0);
+    glLineWidth(2);
+    glEnableClientState(GL_VERTEX_ARRAY);
+    glVertexPointer(2, GL_SHORT, 0, vertices);
+    glDrawArrays(GL_QUADS, 0, 1764);
+    glFlush();
 }
+
 
 void display()
 {
     int frame=0, timebase=0;
-    for (int i = 0; i < 1000; i++){
+    for (int i = 0; i < 10000; i++){
         glClear(GL_COLOR_BUFFER_BIT);
 	    glLoadIdentity();
-	    gluOrtho2D(0, 460, 0, 460);
+	    gluOrtho2D(0, 920, 0, 920);
         generateQR();
 	    drawQR();
         int time = glutGet(GLUT_ELAPSED_TIME);
